@@ -177,7 +177,12 @@ struct HashTable32
         PrefetchNode(id);
 
         // Check our first level cache first
-        for (uint32_t i = 0; i < CacheSize; i++)
+        if (LIKELY(m_cache.m_ids[0] == id))
+        {
+            PREFETCH(m_cache.m_ptrs[0]);
+            return m_cache.m_ptrs[0];
+        }
+        for (uint32_t i = 1; i < CacheSize; i++)
         {
             if (LIKELY(m_cache.m_ids[i] == id))
                 return AddToCache(id, m_cache.m_ptrs[i], i);
